@@ -10,6 +10,7 @@ defmodule DoubleGopher do
   end
 
   def accept(port) do
+    # TODO: packet: :line work with tls?
     {:ok, socket} =
       :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
     Logger.info("Accepting on port #{port}")
@@ -45,7 +46,7 @@ end
 
 defmodule DoubleGopher.Inner do
   # act as a tcp wrapper to interact with server
-  @server_program "gophernicus/src/gophernicus -h localhost -p 7000 -r ."
+  @server_program "gophernicus/src/gophernicus -d -h localhost -p 7000 -r ."
 
   def run_server(line) do
     Port.open({:spawn, @server_program}, [:binary])
@@ -58,8 +59,9 @@ defmodule DoubleGopher.Inner do
   end
 end
 
+
 defmodule DoubleGopher.Outer do
-  # communicate with outer server
+  # communicate with outer server (e.g. geomyidae)
   # which may be online or not
   @server_addr {127,0,0,1}
   @server_port 2333
@@ -85,7 +87,7 @@ defmodule DoubleGopher.Outer do
           old == :ok -> Logger.info("server offline!")
         end
           state end)
-    Process.sleep(1000)
+    Process.sleep(10000)
     check_server_loop()
   end
 
