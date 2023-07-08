@@ -10,16 +10,15 @@ defmodule DoubleGopher do
   end
 
   def accept(port) do
-    # TODO: packet: :line work with tls?
     {:ok, socket} =
-      :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
+      :gen_tcp.listen(port, [:binary, packet: 0, active: false, reuseaddr: true])
     Logger.info("Accepting on port #{port}")
     loop_acceptor(socket)
   end
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    serve(client)
+    spawn(fn -> serve(client) end)
     loop_acceptor(socket)
   end
 
@@ -54,7 +53,7 @@ defmodule DoubleGopher.Inner do
 
     receive do
       {_, {:data, data}} -> data
-      _ -> "0 Server Error\r\n"
+      _ -> "3Server Error\r\n"
     end
   end
 end
@@ -102,8 +101,14 @@ defmodule DoubleGopher.Outer do
       {:tcp, _, data} ->
         loop(socket, acc <> data)
       {:tcp_closed, _} ->
+        Logger.debug("outer server closed connection")
         :gen_tcp.close(socket)
         acc
+      after
+        # do not support TLS
+        100 ->
+          Logger.debug("outer server timed out")
+          "\r\n"
     end
   end
 end
