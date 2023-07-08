@@ -16,11 +16,11 @@ FROM alpine
 # debian don't have frp (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1030841)
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
-COPY --from=buildtime /build/artifacts/gophernicus /usr/local/bin/gophernicus
-RUN apk --no-cache add frp busybox-extras nc-openbsd
+RUN apk --no-cache add busybox-extras netcat-openbsd
 
-COPY inetd.conf        /etc/
-COPY *.sh              /
-COPY gophermap         /var/gopher/
+COPY --from=buildtime /build/artifacts/gophernicus /usr/local/bin/gophernicus
+COPY inetd.conf /etc/
+COPY *.sh       /
+COPY gophermap  /var/gopher/
 
 CMD inetd -fe

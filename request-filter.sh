@@ -14,5 +14,6 @@ then
 	# don't use the busybox version, use the bsd one instead
 	printf "%s\r\n" "${request}" | nc "${dstserver}" "${dstport}"
 else
-	printf "%s\r\n" "${request}" | gophernicus -nr -p 7070
+    # gophernicus don't need linebreak
+	printf "${request}" | gophernicus -p 7070
 fi
