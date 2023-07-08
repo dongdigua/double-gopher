@@ -13,3 +13,10 @@ strange, though
 - have a "fallback" server serving non-stop.
 - if the local server is online, then redirect the network flow to that server
 
+## About Gopher Server
+pygopherd: works
+geomyidae: good
+
+```shell
+./geomyidae -d -h localhost -p 2333 -o 70 -b .
+```
